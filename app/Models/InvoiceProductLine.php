@@ -7,12 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class InvoiceProductLine extends Model
 {
     protected $table = 'invoice_product_lines';
+
+    // UUID configuration
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'invoice_id',
-        'product_name',
+        'name',
+        'price',
         'quantity',
-        'unit_price',
-        'total_unit_price',
     ];
 
     public function invoice()

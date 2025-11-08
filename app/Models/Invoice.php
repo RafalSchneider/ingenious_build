@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Invoice extends Model
 {
     protected $table = 'invoices';
+
+    // UUID configuration
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'status',
         'customer_name',

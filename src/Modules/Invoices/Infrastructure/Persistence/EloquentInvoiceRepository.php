@@ -25,11 +25,15 @@ class EloquentInvoiceRepository implements InvoiceRepositoryInterface
 
     public function save(Invoice $invoice): void
     {
-        $eloquentInvoice = $invoice->getId()
-            ? EloquentInvoice::find($invoice->getId())
-            : new EloquentInvoice();
+        $invoiceId = $invoice->getId();
 
-        if (!$eloquentInvoice->exists) {
+        if ($invoiceId) {
+            $eloquentInvoice = EloquentInvoice::find($invoiceId);
+            if (!$eloquentInvoice) {
+                throw new \RuntimeException("Invoice with ID {$invoiceId} not found");
+            }
+        } else {
+            $eloquentInvoice = new EloquentInvoice();
             $eloquentInvoice->id = Uuid::uuid4()->toString();
             $invoice->setId($eloquentInvoice->id);
         }
@@ -46,10 +50,9 @@ class EloquentInvoiceRepository implements InvoiceRepositoryInterface
             $eloquentProductLine = new EloquentInvoiceProductLine();
             $eloquentProductLine->id = Uuid::uuid4()->toString();
             $eloquentProductLine->invoice_id = $eloquentInvoice->id;
-            $eloquentProductLine->product_name = $productLine->getProductName();
+            $eloquentProductLine->name = $productLine->getProductName();
+            $eloquentProductLine->price = $productLine->getUnitPrice();
             $eloquentProductLine->quantity = $productLine->getQuantity();
-            $eloquentProductLine->unit_price = $productLine->getUnitPrice();
-            $eloquentProductLine->total_unit_price = $productLine->getTotalUnitPrice();
             $eloquentProductLine->save();
         }
     }
@@ -59,9 +62,9 @@ class EloquentInvoiceRepository implements InvoiceRepositoryInterface
         $productLines = [];
         foreach ($eloquentInvoice->productLines as $eloquentProductLine) {
             $productLines[] = new InvoiceProductLine(
-                $eloquentProductLine->product_name,
+                $eloquentProductLine->name,
                 $eloquentProductLine->quantity,
-                $eloquentProductLine->unit_price
+                $eloquentProductLine->price
             );
         }
 
