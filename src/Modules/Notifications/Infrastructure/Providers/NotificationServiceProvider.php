@@ -18,7 +18,7 @@ final class NotificationServiceProvider extends ServiceProvider implements Defer
         $this->app->scoped(NotificationFacadeInterface::class, NotificationFacade::class);
 
         $this->app->singleton(NotificationFacade::class, static fn($app) => new NotificationFacade(
-            driver: $app->make(LaravelMailDriver::class),
+            driver: $app->make(DummyDriver::class),
         ));
     }
 

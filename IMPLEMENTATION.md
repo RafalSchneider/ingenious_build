@@ -207,13 +207,48 @@ POST /invoices/{uuid}/send
 2. Send Invoice (POST /invoices/{id}/send)
    └─> Validate invoice.canBeSent()
    └─> Change status to 'sending'
-   └─> Send email via NotificationFacade
-   └─> DummyDriver triggers webhook
+   └─> Send email via NotificationFacade (DummyDriver)
+   └─> Returns true (email "sent")
 
-3. Webhook receives ResourceDeliveredEvent
+3. Manually trigger webhook to simulate delivery:
+   GET /notification/hook/delivered/{invoice_uuid}
+   └─> NotificationService dispatches ResourceDeliveredEvent
    └─> InvoiceDeliveredListener handles event
    └─> Change invoice status to 'sent-to-client'
 ```
+
+**Note**: The DummyDriver is used as specified in the requirements. In production,
+this would be replaced with a real email service (SendGrid, Mailgun, etc.) that
+automatically triggers the webhook callback when the email is delivered.
+
+## How to Test the Complete Flow
+
+1. **Create an invoice:**
+
+    ```bash
+    POST /invoices
+    {
+      "customer_name": "John Doe",
+      "customer_email": "john@example.com",
+      "product_lines": [{"name": "Product A", "quantity": 2, "price": 100}]
+    }
+    ```
+
+    Response will include the invoice UUID.
+
+2. **Send the invoice:**
+
+    ```bash
+    POST /invoices/{uuid}/send
+    ```
+
+    Status changes to `sending`.
+
+3. **Manually trigger the webhook to simulate delivery:**
+    ```bash
+    GET /notification/hook/delivered/{uuid}
+    ```
+    Status changes to `sent-to-client`.
 
 ## Technical Decisions
 
