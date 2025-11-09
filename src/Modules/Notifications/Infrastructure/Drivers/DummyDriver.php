@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 declare(strict_types=1);
 
@@ -12,8 +12,8 @@ class DummyDriver implements DriverInterface
         string $message,
         string $reference,
     ): bool {
-        // Dummy notification provider - symuluje wysłanie emaila
-        // Webhook jest wywołany przez NotificationFacade
+        // Dummy notification provider - symuluje wysĹ‚anie emaila
+        // Webhook jest wywoĹ‚any przez NotificationFacade
 
         return true;
     }
