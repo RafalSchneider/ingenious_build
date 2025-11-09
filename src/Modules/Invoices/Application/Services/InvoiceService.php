@@ -32,8 +32,8 @@ class InvoiceService
         // Create product lines if provided
         foreach ($productLinesData as $lineData) {
             $invoice->productLines()->create([
-                'name' => $lineData->getProductName(),
-                'price' => $lineData->getUnitPrice(),
+                'name' => $lineData->getName(),
+                'price' => $lineData->getPrice(),
                 'quantity' => $lineData->getQuantity(),
             ]);
         }

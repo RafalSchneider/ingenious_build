@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Notifications\Api\NotificationFacadeInterface;
 use Modules\Notifications\Application\Facades\NotificationFacade;
 use Modules\Notifications\Infrastructure\Drivers\DummyDriver;
+use Modules\Notifications\Infrastructure\Drivers\LaravelMailDriver;
 
 final class NotificationServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -16,8 +17,8 @@ final class NotificationServiceProvider extends ServiceProvider implements Defer
     {
         $this->app->scoped(NotificationFacadeInterface::class, NotificationFacade::class);
 
-        $this->app->singleton(NotificationFacade::class, static fn ($app) => new NotificationFacade(
-            driver: $app->make(DummyDriver::class),
+        $this->app->singleton(NotificationFacade::class, static fn($app) => new NotificationFacade(
+            driver: $app->make(LaravelMailDriver::class),
         ));
     }
 

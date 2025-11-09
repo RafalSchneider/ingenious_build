@@ -6,20 +6,20 @@ namespace Modules\Invoices\Domain\Entities;
 
 class InvoiceProductLine
 {
-    private string $productName;
+    private string $name;
     private int $quantity;
-    private int $unitPrice;
+    private int $price;
 
-    public function __construct(string $productName, int $quantity, int $unitPrice)
+    public function __construct(string $name, int $quantity, int $price)
     {
-        $this->productName = $productName;
+        $this->name = $name;
         $this->quantity = $quantity;
-        $this->unitPrice = $unitPrice;
+        $this->price = $price;
     }
 
-    public function getProductName(): string
+    public function getName(): string
     {
-        return $this->productName;
+        return $this->name;
     }
 
     public function getQuantity(): int
@@ -27,13 +27,13 @@ class InvoiceProductLine
         return $this->quantity;
     }
 
-    public function getUnitPrice(): int
+    public function getPrice(): int
     {
-        return $this->unitPrice;
+        return $this->price;
     }
 
     public function getTotalUnitPrice(): int
     {
-        return $this->quantity * $this->unitPrice;
+        return $this->quantity * $this->price;
     }
 }

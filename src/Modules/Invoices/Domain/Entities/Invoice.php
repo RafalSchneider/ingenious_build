@@ -65,7 +65,7 @@ class Invoice
             return false;
         }
         foreach ($this->productLines as $line) {
-            if ($line->getQuantity() <= 0 || $line->getUnitPrice() <= 0) {
+            if ($line->getQuantity() <= 0 || $line->getPrice() <= 0) {
                 return false;
             }
         }

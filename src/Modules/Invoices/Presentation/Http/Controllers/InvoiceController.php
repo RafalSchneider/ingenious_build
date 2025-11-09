@@ -44,10 +44,9 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
-        // Transform product lines from request to domain entities
         $productLinesData = $request->input('product_lines', []);
         $productLines = array_map(function ($lineData) {
-            return new \Modules\Invoices\Domain\Entities\InvoiceProductLine(
+            return new InvoiceProductLine(
                 $lineData['name'] ?? '',
                 $lineData['quantity'] ?? 0,
                 $lineData['price'] ?? 0
