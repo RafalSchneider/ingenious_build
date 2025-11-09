@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Modules\Invoices\Domain\Entities;
 
+use Modules\Invoices\Domain\Enums\StatusEnum;
+
 class Invoice
 {
     private ?string $id;
-    private string $status;
+    private StatusEnum $status;
     private string $customerName;
     private string $customerEmail;
     /** @var InvoiceProductLine[] */
@@ -15,7 +17,7 @@ class Invoice
 
     public function __construct(
         ?string $id,
-        string $status,
+        StatusEnum $status,
         string $customerName,
         string $customerEmail,
         array $productLines = []
@@ -31,11 +33,8 @@ class Invoice
     {
         return $this->id;
     }
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
-    public function getStatus(): string
+
+    public function getStatus(): StatusEnum
     {
         return $this->status;
     }
@@ -59,7 +58,7 @@ class Invoice
 
     public function canBeSent(): bool
     {
-        if ($this->status !== 'draft') {
+        if ($this->status !== StatusEnum::Draft) {
             return false;
         }
         if (empty($this->productLines)) {
@@ -75,15 +74,15 @@ class Invoice
 
     public function markAsSending(): void
     {
-        if ($this->status === 'draft' && $this->canBeSent()) {
-            $this->status = 'sending';
+        if ($this->status === StatusEnum::Draft && $this->canBeSent()) {
+            $this->status = StatusEnum::Sending;
         }
     }
 
     public function markAsSentToClient(): void
     {
-        if ($this->status === 'sending') {
-            $this->status = 'sent-to-client';
+        if ($this->status === StatusEnum::Sending) {
+            $this->status = StatusEnum::SentToClient;
         }
     }
 }

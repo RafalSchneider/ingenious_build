@@ -13,15 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invoice_product_lines', static function (Blueprint $table): void {
+        Schema::create('invoices', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->uuid('invoice_id');
-            $table->string('name');
-            $table->integer('price');
-            $table->integer('quantity');
+            $table->string('customer_name');
+            $table->string('customer_email');
+            $table->string('status');
             $table->timestamps();
-
-            $table->foreign('invoice_id')->references('id')->on('invoices');
         });
     }
 
@@ -30,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoice_product_lines');
+        Schema::dropIfExists('invoices');
     }
 };

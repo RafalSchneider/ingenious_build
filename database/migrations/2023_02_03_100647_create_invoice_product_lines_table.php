@@ -16,13 +16,12 @@ return new class extends Migration
         Schema::create('invoice_product_lines', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->uuid('invoice_id');
-            $table->string('product_name');
+            $table->string('name');
+            $table->integer('price');
             $table->integer('quantity');
-            $table->integer('unit_price');
-            $table->integer('total_unit_price');
             $table->timestamps();
 
-            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+            $table->foreign('invoice_id')->references('id')->on('invoices');
         });
     }
 

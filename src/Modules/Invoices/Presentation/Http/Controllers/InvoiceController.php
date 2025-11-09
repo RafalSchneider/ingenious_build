@@ -32,10 +32,10 @@ class InvoiceController extends Controller
             'customer_email' => $invoice->getCustomerEmail(),
             'product_lines' => array_map(function ($line) {
                 return [
-                    'product_name' => $line->getProductName(),
+                    'name' => $line->getProductName(),
                     'quantity' => $line->getQuantity(),
-                    'unit_price' => $line->getUnitPrice(),
-                    'total_unit_price' => $line->getTotalUnitPrice(),
+                    'price' => $line->getUnitPrice(),
+                    'total_price' => $line->getTotalUnitPrice(),
                 ];
             }, $invoice->getProductLines()),
             'total_price' => $invoice->getTotalPrice(),
@@ -48,9 +48,9 @@ class InvoiceController extends Controller
         $productLinesData = $request->input('product_lines', []);
         $productLines = array_map(function ($lineData) {
             return new InvoiceProductLine(
-                $lineData['product_name'] ?? '',
+                $lineData['name'] ?? '',
                 $lineData['quantity'] ?? 0,
-                $lineData['unit_price'] ?? 0
+                $lineData['price'] ?? 0
             );
         }, $productLinesData);
 
@@ -67,10 +67,10 @@ class InvoiceController extends Controller
             'customer_email' => $invoice->getCustomerEmail(),
             'product_lines' => array_map(function ($line) {
                 return [
-                    'product_name' => $line->getProductName(),
+                    'name' => $line->getProductName(),
                     'quantity' => $line->getQuantity(),
-                    'unit_price' => $line->getUnitPrice(),
-                    'total_unit_price' => $line->getTotalUnitPrice(),
+                    'price' => $line->getUnitPrice(),
+                    'total_price' => $line->getTotalUnitPrice(),
                 ];
             }, $invoice->getProductLines()),
             'total_price' => $invoice->getTotalPrice(),

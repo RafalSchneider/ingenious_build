@@ -116,7 +116,7 @@ src/Modules/Invoices/
 #### Migrations
 
 -   **invoices table**: id (UUID), customer_name, customer_email, status, timestamps
--   **invoice_product_lines table**: id (UUID), invoice_id (FK), product_name, quantity, unit_price, total_unit_price, timestamps
+-   **invoice_product_lines table**: id (UUID), invoice_id (FK), name, quantity, price, timestamps
 
 ### 6. Unit Tests
 
@@ -158,9 +158,9 @@ Content-Type: application/json
   "customer_email": "john@example.com",
   "product_lines": [
     {
-      "product_name": "Product A",
+      "name": "Product A",
       "quantity": 2,
-      "unit_price": 100
+      "price": 100
     }
   ]
 }
@@ -182,10 +182,10 @@ Response:
     "customer_email": "john@example.com",
     "product_lines": [
         {
-            "product_name": "Product A",
+            "name": "Product A",
             "quantity": 2,
-            "unit_price": 100,
-            "total_unit_price": 200
+            "price": 100,
+            "total_price": 200
         }
     ],
     "total_price": 200
