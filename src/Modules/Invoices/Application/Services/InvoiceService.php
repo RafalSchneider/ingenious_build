@@ -38,7 +38,8 @@ class InvoiceService
             ]);
         }
 
-        return $invoice->fresh('productLines');
+        // Reload from repository to get fresh data with relations
+        return $this->invoiceRepository->findById($invoice->id);
     }
 
     public function getInvoice(string $id): ?Invoice

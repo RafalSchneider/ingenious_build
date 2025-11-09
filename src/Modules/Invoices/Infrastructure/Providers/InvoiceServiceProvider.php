@@ -18,19 +18,14 @@ class InvoiceServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Bind repository interface to implementation
         $this->app->bind(
             InvoiceRepositoryInterface::class,
             EloquentInvoiceRepository::class
         );
     }
 
-    /**
-     * Bootstrap services.
-     */
     public function boot(): void
     {
-        // Register event listener for ResourceDeliveredEvent
         Event::listen(
             ResourceDeliveredEvent::class,
             InvoiceDeliveredListener::class

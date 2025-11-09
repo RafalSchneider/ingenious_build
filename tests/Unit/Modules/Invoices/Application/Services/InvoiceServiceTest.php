@@ -35,7 +35,7 @@ class InvoiceServiceTest extends TestCase
 
     public function test_creates_invoice_in_draft_status(): void
     {
-        $invoice = new Invoice();
+        $invoice = $this->createMock(Invoice::class);
         $invoice->id = '123e4567-e89b-12d3-a456-426614174000';
         $invoice->status = StatusEnum::Draft;
         $invoice->customer_name = 'John Doe';
@@ -49,11 +49,18 @@ class InvoiceServiceTest extends TestCase
                     && $inv->status === StatusEnum::Draft
                     && $inv->customer_name === 'John Doe'
                     && $inv->customer_email === 'john@example.com';
-            }))
-            ->willReturnCallback(function ($inv) use ($invoice) {
-                $inv->id = $invoice->id;
-                return $invoice;
-            });
+            }));
+
+        $freshInvoice = $this->createMock(Invoice::class);
+        $freshInvoice->id = '123e4567-e89b-12d3-a456-426614174000';
+        $freshInvoice->status = StatusEnum::Draft;
+        $freshInvoice->customer_name = 'John Doe';
+        $freshInvoice->customer_email = 'john@example.com';
+
+        $this->invoiceRepository
+            ->expects($this->once())
+            ->method('findById')
+            ->willReturn($freshInvoice);
 
         $result = $this->invoiceService->createInvoice(
             'John Doe',
@@ -69,22 +76,38 @@ class InvoiceServiceTest extends TestCase
 
     public function test_creates_invoice_with_product_lines(): void
     {
-        $invoice = new Invoice();
-        $invoice->id = '123e4567-e89b-12d3-a456-426614174000';
-        $invoice->status = StatusEnum::Draft;
-        $invoice->customer_name = 'Jane Smith';
-        $invoice->customer_email = 'jane@example.com';
-
         $productLine1 = new \Modules\Invoices\Domain\Entities\InvoiceProductLine('Product A', 2, 100);
         $productLine2 = new \Modules\Invoices\Domain\Entities\InvoiceProductLine('Product B', 1, 250);
+
+        $productLinesMock = $this->createMock(\Illuminate\Database\Eloquent\Relations\HasMany::class);
+        $productLinesMock->expects($this->exactly(2))
+            ->method('create')
+            ->willReturn(new InvoiceProductLine());
+
+        $savedInvoice = $this->createMock(Invoice::class);
+        $savedInvoice->id = '123e4567-e89b-12d3-a456-426614174000';
+
+        $savedInvoice->expects($this->exactly(2))
+            ->method('productLines')
+            ->willReturn($productLinesMock);
 
         $this->invoiceRepository
             ->expects($this->once())
             ->method('save')
-            ->willReturnCallback(function ($inv) use ($invoice) {
-                $inv->id = $invoice->id;
-                return $invoice;
+            ->willReturnCallback(function ($inv) use ($savedInvoice) {
+                $inv->id = $savedInvoice->id;
+                return $savedInvoice;
             });
+
+        $freshInvoice = $this->createMock(Invoice::class);
+        $freshInvoice->id = '123e4567-e89b-12d3-a456-426614174000';
+        $freshInvoice->status = StatusEnum::Draft;
+
+        $this->invoiceRepository
+            ->expects($this->once())
+            ->method('findById')
+            ->with('123e4567-e89b-12d3-a456-426614174000')
+            ->willReturn($freshInvoice);
 
         $result = $this->invoiceService->createInvoice(
             'Jane Smith',
@@ -136,19 +159,22 @@ class InvoiceServiceTest extends TestCase
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
 
-        $invoice = new Invoice();
+        $invoice = $this->createMock(Invoice::class);
         $invoice->id = $invoiceId;
         $invoice->status = StatusEnum::Draft;
         $invoice->customer_name = 'Test User';
         $invoice->customer_email = 'test@example.com';
 
-        // Mock product lines relationship
-        $productLine = new InvoiceProductLine();
-        $productLine->name = 'Product A';
-        $productLine->quantity = 2;
-        $productLine->price = 100;
+        $invoice->expects($this->once())
+            ->method('canBeSent')
+            ->willReturn(true);
 
-        $invoice->setRelation('productLines', collect([$productLine]));
+        $invoice->expects($this->once())
+            ->method('markAsSending');
+
+        $invoice->expects($this->once())
+            ->method('getTotalPrice')
+            ->willReturn(200);
 
         $this->invoiceRepository
             ->expects($this->once())
@@ -159,9 +185,7 @@ class InvoiceServiceTest extends TestCase
         $this->invoiceRepository
             ->expects($this->once())
             ->method('save')
-            ->with($this->callback(function ($inv) {
-                return $inv instanceof Invoice && $inv->status === StatusEnum::Sending;
-            }));
+            ->with($invoice);
 
         $this->notificationFacade
             ->expects($this->once())
@@ -206,13 +230,11 @@ class InvoiceServiceTest extends TestCase
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
 
-        // Invoice without product lines cannot be sent
-        $invoice = new Invoice();
-        $invoice->id = $invoiceId;
-        $invoice->status = StatusEnum::Draft;
-        $invoice->customer_name = 'Test User';
-        $invoice->customer_email = 'test@example.com';
-        $invoice->setRelation('productLines', collect([]));
+        $invoice = $this->createMock(Invoice::class);
+
+        $invoice->expects($this->once())
+            ->method('canBeSent')
+            ->willReturn(false);
 
         $this->invoiceRepository
             ->expects($this->once())
@@ -237,18 +259,11 @@ class InvoiceServiceTest extends TestCase
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
 
-        $invoice = new Invoice();
-        $invoice->id = $invoiceId;
-        $invoice->status = StatusEnum::Sending; // Not Draft
-        $invoice->customer_name = 'Test User';
-        $invoice->customer_email = 'test@example.com';
+        $invoice = $this->createMock(Invoice::class);
 
-        $productLine = new InvoiceProductLine();
-        $productLine->name = 'Product A';
-        $productLine->quantity = 2;
-        $productLine->price = 100;
-
-        $invoice->setRelation('productLines', collect([$productLine]));
+        $invoice->expects($this->once())
+            ->method('canBeSent')
+            ->willReturn(false);
 
         $this->invoiceRepository
             ->expects($this->once())
@@ -273,18 +288,11 @@ class InvoiceServiceTest extends TestCase
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
 
-        $invoice = new Invoice();
-        $invoice->id = $invoiceId;
-        $invoice->status = StatusEnum::Draft;
-        $invoice->customer_name = 'Test User';
-        $invoice->customer_email = 'test@example.com';
+        $invoice = $this->createMock(Invoice::class);
 
-        $productLine = new InvoiceProductLine();
-        $productLine->name = 'Product A';
-        $productLine->quantity = 0; // Invalid
-        $productLine->price = 100;
-
-        $invoice->setRelation('productLines', collect([$productLine]));
+        $invoice->expects($this->once())
+            ->method('canBeSent')
+            ->willReturn(false);
 
         $this->invoiceRepository
             ->expects($this->once())
@@ -309,18 +317,11 @@ class InvoiceServiceTest extends TestCase
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
 
-        $invoice = new Invoice();
-        $invoice->id = $invoiceId;
-        $invoice->status = StatusEnum::Draft;
-        $invoice->customer_name = 'Test User';
-        $invoice->customer_email = 'test@example.com';
+        $invoice = $this->createMock(Invoice::class);
 
-        $productLine = new InvoiceProductLine();
-        $productLine->name = 'Product A';
-        $productLine->quantity = 2;
-        $productLine->price = 0; // Invalid
-
-        $invoice->setRelation('productLines', collect([$productLine]));
+        $invoice->expects($this->once())
+            ->method('canBeSent')
+            ->willReturn(false);
 
         $this->invoiceRepository
             ->expects($this->once())

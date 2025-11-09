@@ -215,9 +215,8 @@ class InvoiceTest extends TestCase
         $this->assertEquals(StatusEnum::Sending, $invoice->getStatus());
     }
 
-    public function test_does_not_mark_as_sending_when_invoice_cannot_be_sent(): void
+    public function test_does_not_mark_as_sending_when_product_lines_are_empty(): void
     {
-        // Invoice without product lines cannot be sent
         $invoice = new Invoice(
             id: null,
             status: StatusEnum::Draft,
@@ -228,7 +227,6 @@ class InvoiceTest extends TestCase
 
         $invoice->markAsSending();
 
-        // Status should remain Draft
         $this->assertEquals(StatusEnum::Draft, $invoice->getStatus());
     }
 
@@ -246,7 +244,6 @@ class InvoiceTest extends TestCase
 
         $invoice->markAsSending();
 
-        // Status should remain Sending
         $this->assertEquals(StatusEnum::Sending, $invoice->getStatus());
     }
 
@@ -281,7 +278,6 @@ class InvoiceTest extends TestCase
 
         $invoice->markAsSentToClient();
 
-        // Status should remain Draft
         $this->assertEquals(StatusEnum::Draft, $invoice->getStatus());
     }
 
@@ -299,7 +295,6 @@ class InvoiceTest extends TestCase
 
         $invoice->markAsSentToClient();
 
-        // Status should remain SentToClient
         $this->assertEquals(StatusEnum::SentToClient, $invoice->getStatus());
     }
 
