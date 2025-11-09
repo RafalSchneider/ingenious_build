@@ -26,18 +26,18 @@ class InvoiceController extends Controller
         }
 
         return response()->json([
-            'id' => $invoice->getId(),
-            'status' => $invoice->getStatus(),
-            'customer_name' => $invoice->getCustomerName(),
-            'customer_email' => $invoice->getCustomerEmail(),
-            'product_lines' => array_map(function ($line) {
+            'id' => $invoice->id,
+            'status' => $invoice->status,
+            'customer_name' => $invoice->customer_name,
+            'customer_email' => $invoice->customer_email,
+            'product_lines' => $invoice->productLines->map(function ($line) {
                 return [
-                    'name' => $line->getProductName(),
-                    'quantity' => $line->getQuantity(),
-                    'price' => $line->getUnitPrice(),
+                    'name' => $line->name,
+                    'quantity' => $line->quantity,
+                    'price' => $line->price,
                     'total_price' => $line->getTotalUnitPrice(),
                 ];
-            }, $invoice->getProductLines()),
+            }),
             'total_price' => $invoice->getTotalPrice(),
         ]);
     }
@@ -47,7 +47,7 @@ class InvoiceController extends Controller
         // Transform product lines from request to domain entities
         $productLinesData = $request->input('product_lines', []);
         $productLines = array_map(function ($lineData) {
-            return new InvoiceProductLine(
+            return new \Modules\Invoices\Domain\Entities\InvoiceProductLine(
                 $lineData['name'] ?? '',
                 $lineData['quantity'] ?? 0,
                 $lineData['price'] ?? 0
@@ -61,18 +61,18 @@ class InvoiceController extends Controller
         );
 
         return response()->json([
-            'id' => $invoice->getId(),
-            'status' => $invoice->getStatus(),
-            'customer_name' => $invoice->getCustomerName(),
-            'customer_email' => $invoice->getCustomerEmail(),
-            'product_lines' => array_map(function ($line) {
+            'id' => $invoice->id,
+            'status' => $invoice->status,
+            'customer_name' => $invoice->customer_name,
+            'customer_email' => $invoice->customer_email,
+            'product_lines' => $invoice->productLines->map(function ($line) {
                 return [
-                    'name' => $line->getProductName(),
-                    'quantity' => $line->getQuantity(),
-                    'price' => $line->getUnitPrice(),
+                    'name' => $line->name,
+                    'quantity' => $line->quantity,
+                    'price' => $line->price,
                     'total_price' => $line->getTotalUnitPrice(),
                 ];
-            }, $invoice->getProductLines()),
+            }),
             'total_price' => $invoice->getTotalPrice(),
         ], 201);
     }

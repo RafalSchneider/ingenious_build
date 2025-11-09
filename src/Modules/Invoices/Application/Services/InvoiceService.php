@@ -32,9 +32,9 @@ class InvoiceService
         // Create product lines if provided
         foreach ($productLinesData as $lineData) {
             $invoice->productLines()->create([
-                'name' => $lineData['name'] ?? $lineData['productName'],
-                'price' => $lineData['price'] ?? $lineData['unitPrice'],
-                'quantity' => $lineData['quantity'],
+                'name' => $lineData->getProductName(),
+                'price' => $lineData->getUnitPrice(),
+                'quantity' => $lineData->getQuantity(),
             ]);
         }
 
@@ -55,6 +55,7 @@ class InvoiceService
         }
 
         $invoice->markAsSending();
+        $this->invoiceRepository->save($invoice);
 
         $notifyData = new NotifyData(
             resourceId: Uuid::fromString($invoice->id),
