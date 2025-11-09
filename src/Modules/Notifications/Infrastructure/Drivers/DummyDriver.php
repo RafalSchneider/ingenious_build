@@ -12,9 +12,6 @@ class DummyDriver implements DriverInterface
         string $message,
         string $reference,
     ): bool {
-        // Dummy notification provider - symuluje wysĹ‚anie emaila
-        // Webhook jest wywoĹ‚any przez NotificationFacade
-
         return true;
     }
 }

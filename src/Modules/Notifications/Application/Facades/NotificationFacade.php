@@ -24,8 +24,6 @@ final readonly class NotificationFacade implements NotificationFacadeInterface
             reference: $data->resourceId->toString(),
         );
 
-
-        // symulacja callbacku od zewnętrznego dostawcy
         if ($success) {
             $this->triggerDeliveredWebhook($data->resourceId->toString());
         }
@@ -33,8 +31,6 @@ final readonly class NotificationFacade implements NotificationFacadeInterface
 
     private function triggerDeliveredWebhook(string $reference): void
     {
-        // Dispatch job to simulate webhook callback asynchronously
-        // In production, this would be a real webhook from external notification provider
         SimulateWebhookCallbackJob::dispatch($reference);
     }
 }
