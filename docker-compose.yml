@@ -38,15 +38,7 @@ services:
                 - ping
             retries: 3
             timeout: 5s
-    worker:
-        image: "sail-8.4/app"
-        volumes:
-            - ".:/var/www/html"
-        networks:
-            - sail
-        depends_on:
-            - redis
-        command: php artisan queue:work
+
 networks:
     sail:
         driver: bridge
