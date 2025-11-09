@@ -14,7 +14,7 @@ class DummyDriver implements DriverInterface
     ): bool {
         // Dummy notification provider - symuluje wysłanie emaila
         // Webhook jest wywołany przez NotificationFacade
-        
+
         return true;
     }
 }
