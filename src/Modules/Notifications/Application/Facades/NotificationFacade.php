@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\Notifications\Application\Facades;
 
-use Illuminate\Support\Facades\Http;
 use Modules\Notifications\Api\Dtos\NotifyData;
 use Modules\Notifications\Api\NotificationFacadeInterface;
+use Modules\Notifications\Application\Jobs\SimulateWebhookCallbackJob;
 use Modules\Notifications\Infrastructure\Drivers\DriverInterface;
 
 final readonly class NotificationFacade implements NotificationFacadeInterface
@@ -33,13 +33,8 @@ final readonly class NotificationFacade implements NotificationFacadeInterface
 
     private function triggerDeliveredWebhook(string $reference): void
     {
-
-
-        $webhookUrl = route('notification.hook', [
-            'action' => 'delivered',
-            'reference' => $reference
-        ]);
-
-        Http::timeout(1)->get($webhookUrl);
+        // Dispatch job to simulate webhook callback asynchronously
+        // In production, this would be a real webhook from external notification provider
+        SimulateWebhookCallbackJob::dispatch($reference);
     }
 }
