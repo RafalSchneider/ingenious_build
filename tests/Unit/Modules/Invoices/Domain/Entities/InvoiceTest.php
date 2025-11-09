@@ -209,7 +209,7 @@ class InvoiceTest extends TestCase
         );
 
         $this->assertEquals(StatusEnum::Draft, $invoice->getStatus());
-        
+
         $invoice->markAsSending();
 
         $this->assertEquals(StatusEnum::Sending, $invoice->getStatus());

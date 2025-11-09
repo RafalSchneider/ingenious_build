@@ -24,7 +24,7 @@ class InvoiceDeliveredListenerTest extends TestCase
         parent::setUp();
 
         $this->invoiceRepository = $this->createMock(InvoiceRepositoryInterface::class);
-        
+
         $this->listener = new InvoiceDeliveredListener($this->invoiceRepository);
     }
 
@@ -75,7 +75,7 @@ class InvoiceDeliveredListenerTest extends TestCase
 
         // Should not throw any exception
         $this->listener->handle($event);
-        
+
         $this->assertTrue(true); // Assert we got here without errors
     }
 

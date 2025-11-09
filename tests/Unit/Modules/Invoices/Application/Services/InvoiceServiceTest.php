@@ -26,7 +26,7 @@ class InvoiceServiceTest extends TestCase
 
         $this->invoiceRepository = $this->createMock(InvoiceRepositoryInterface::class);
         $this->notificationFacade = $this->createMock(NotificationFacadeInterface::class);
-        
+
         $this->invoiceService = new InvoiceService(
             $this->invoiceRepository,
             $this->notificationFacade
@@ -45,7 +45,7 @@ class InvoiceServiceTest extends TestCase
             ->expects($this->once())
             ->method('save')
             ->with($this->callback(function ($inv) {
-                return $inv instanceof Invoice 
+                return $inv instanceof Invoice
                     && $inv->status === StatusEnum::Draft
                     && $inv->customer_name === 'John Doe'
                     && $inv->customer_email === 'john@example.com';
@@ -98,7 +98,7 @@ class InvoiceServiceTest extends TestCase
     public function test_gets_invoice_by_id(): void
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
-        
+
         $invoice = new Invoice();
         $invoice->id = $invoiceId;
         $invoice->status = StatusEnum::Draft;
@@ -135,19 +135,19 @@ class InvoiceServiceTest extends TestCase
     public function test_sends_invoice_successfully(): void
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
-        
+
         $invoice = new Invoice();
         $invoice->id = $invoiceId;
         $invoice->status = StatusEnum::Draft;
         $invoice->customer_name = 'Test User';
         $invoice->customer_email = 'test@example.com';
-        
+
         // Mock product lines relationship
         $productLine = new InvoiceProductLine();
         $productLine->name = 'Product A';
         $productLine->quantity = 2;
         $productLine->price = 100;
-        
+
         $invoice->setRelation('productLines', collect([$productLine]));
 
         $this->invoiceRepository
@@ -205,7 +205,7 @@ class InvoiceServiceTest extends TestCase
     public function test_does_not_send_invoice_when_cannot_be_sent(): void
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
-        
+
         // Invoice without product lines cannot be sent
         $invoice = new Invoice();
         $invoice->id = $invoiceId;
@@ -236,18 +236,18 @@ class InvoiceServiceTest extends TestCase
     public function test_does_not_send_invoice_when_status_is_not_draft(): void
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
-        
+
         $invoice = new Invoice();
         $invoice->id = $invoiceId;
         $invoice->status = StatusEnum::Sending; // Not Draft
         $invoice->customer_name = 'Test User';
         $invoice->customer_email = 'test@example.com';
-        
+
         $productLine = new InvoiceProductLine();
         $productLine->name = 'Product A';
         $productLine->quantity = 2;
         $productLine->price = 100;
-        
+
         $invoice->setRelation('productLines', collect([$productLine]));
 
         $this->invoiceRepository
@@ -272,18 +272,18 @@ class InvoiceServiceTest extends TestCase
     public function test_does_not_send_invoice_when_product_lines_have_zero_quantity(): void
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
-        
+
         $invoice = new Invoice();
         $invoice->id = $invoiceId;
         $invoice->status = StatusEnum::Draft;
         $invoice->customer_name = 'Test User';
         $invoice->customer_email = 'test@example.com';
-        
+
         $productLine = new InvoiceProductLine();
         $productLine->name = 'Product A';
         $productLine->quantity = 0; // Invalid
         $productLine->price = 100;
-        
+
         $invoice->setRelation('productLines', collect([$productLine]));
 
         $this->invoiceRepository
@@ -308,18 +308,18 @@ class InvoiceServiceTest extends TestCase
     public function test_does_not_send_invoice_when_product_lines_have_zero_price(): void
     {
         $invoiceId = '123e4567-e89b-12d3-a456-426614174000';
-        
+
         $invoice = new Invoice();
         $invoice->id = $invoiceId;
         $invoice->status = StatusEnum::Draft;
         $invoice->customer_name = 'Test User';
         $invoice->customer_email = 'test@example.com';
-        
+
         $productLine = new InvoiceProductLine();
         $productLine->name = 'Product A';
         $productLine->quantity = 2;
         $productLine->price = 0; // Invalid
-        
+
         $invoice->setRelation('productLines', collect([$productLine]));
 
         $this->invoiceRepository
