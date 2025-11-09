@@ -1,10 +1,8 @@
-<?php
+﻿<?php
 
 declare(strict_types=1);
 
 namespace Modules\Notifications\Infrastructure\Drivers;
-
-use Illuminate\Support\Facades\Http;
 
 class DummyDriver implements DriverInterface
 {
@@ -14,16 +12,13 @@ class DummyDriver implements DriverInterface
         string $message,
         string $reference,
     ): bool {
-        // Dummy driver - symuluje wysłanie emaila
-        // W prawdziwej implementacji tutaj byłoby wywołanie API (SendGrid, Mailgun, etc.)
+        // Dummy notification provider - symuluje wysłanie emaila
+        // W prawdziwej implementacji (SendGrid, Mailgun, etc.) 
+        // dostawca wysyłałby email i wywołał webhook gdy email zostanie dostarczony
 
-        // Symuluj callback od dostawcy emaili - wywołaj webhook
-        $webhookUrl = route('notification.hook', [
-            'action' => 'delivered',
-            'reference' => $reference
-        ]);
-
-        Http::get($webhookUrl);
+        // Tutaj nic nie robimy - webhook musi być wywołany zewnętrznie
+        // Aby zasymulować dostarczenie, wywołaj ręcznie:
+        // GET /notification/hook/delivered/{reference}
 
         return true;
     }
